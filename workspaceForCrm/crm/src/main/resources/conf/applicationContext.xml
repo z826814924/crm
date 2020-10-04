@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--spring配置文件：声明service,dao,工具类等对象-->
+
+
+    <!--声明jdbc连接属性配置文件的位置,将其加载进来
+    spring配准文件中读取其他文件要加classpath:
+    -->
+    <context:property-placeholder location="classpath:conf/jdbc.properties"/>
+
+    <!--声明数据源，连接数据库
+    id:唯一标识，自己取，习惯叫dataSource
+    声明两个方法
+    init-method="init"
+    destroy-method="close"
+    不要加小括号
+    -->
+    <bean id="dataSource"  class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close">
+        <!--连接数据库的属性，value是set注入-->
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="maxActive" value="${jdbc.max}"/>
+    </bean>
+
+
+    <!--声明SqlSessionFactoryBean创建SqlSessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 用Set注入方法（ setDataSource（））传值给属性 ref说明传进去一个属性数据源的对象
+        用的是上面数据源的id：dataSource 是唯一表示
+        -->
+        <property name="dataSource" ref="dataSource"/>
+        <!--Set注入的Resource 用value 当做特殊来记，指定类路径下的某个文件，文件名是你自定义的-->
+        <property name="configLocation" value="classpath:conf/mybatis-config.xml" />
+
+    </bean>
+
+    <!--声明mybatis的扫描器，创建dao对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--sqlSessionFactoryBeanName这个属性是String，用value
+        把上面创建好的sqlSessionFactory写入value
+        -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- value:写入dao中所有的接口所在的包名，这样dao中所有接口都会创建出dao的对象,进行访问数据库-->
+        <property name="basePackage" value="com.bjpowernode.crm.settings.dao"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--sqlSessionFactoryBeanName这个属性是String，用value
+        把上面创建好的sqlSessionFactory写入value
+        -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- value:写入dao中所有的接口所在的包名，这样dao中所有接口都会创建出dao的对象,进行访问数据库-->
+        <property name="basePackage" value="com.bjpowernode.crm.workbench.dao"/>
+    </bean>
+
+    <!--声明service的注解@Service所在的包名位置-->
+    <context:component-scan base-package="com.bjpowernode.crm.settings.service"/>
+    <context:component-scan base-package="com.bjpowernode.crm.workbench.service"/>
+
+    <bean id="paginationVO" class="com.bjpowernode.crm.vo.PaginationVO"/>
+
+
+
+    <!--事物配置:注解的配置，aspectj的配置-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>

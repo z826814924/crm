@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<!--springMVC配置文件,声明controller和其他web相关的对象-->
+
+    <!--声明组件扫描器-->
+    <context:component-scan base-package="com.bjpowernode.crm"/>
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!--配置前缀和后缀-->
+        <!--赋值用的是set注入,由于prefix和suffix是字符串所以用value而不是ref-->
+       <!-- <property name="prefix" value="/workbench/"/>
+        <property name="suffix" value=".html"/>-->
+    </bean>
+
+<!--
+    &lt;!&ndash;声明视图解析器&ndash;&gt;
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        &lt;!&ndash;配置前缀和后缀&ndash;&gt;
+        &lt;!&ndash;赋值用的是set注入,由于prefix和suffix是字符串所以用value而不是ref&ndash;&gt;
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+-->
+
+
+    <!--声明注解驱动,辨别方式:以mvc结尾，功能很多：
+    1.响应ajax，返回json
+    2.解决静态资源访问问题
+    -->
+
+
+   <mvc:annotation-driven/>
+    <mvc:default-servlet-handler/>
+
+    <!--声明拦截器 0或多个
+框架中保存多个拦截器是ArrayList
+按照声明的先后顺序放入ArrayList
+-->
+<mvc:interceptors>
+    <!--声明第一个拦截器-->
+    <mvc:interceptor>
+        <!--path：指定拦截请求的url，可以使用通配符 **
+   **：表示任意字符，多及目录，和目录中的文件
+   -->
+        <mvc:mapping path="/**"/>
+        <!--声明拦截器对象-->
+        <bean class="com.bjpowernode.crm.settings.handler.MyInterceptor"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+</beans>

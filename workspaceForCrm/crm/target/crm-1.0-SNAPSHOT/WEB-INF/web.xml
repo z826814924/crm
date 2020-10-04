@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!--
+    add/create:跳转到添加页,或者打开添加操作的模态窗口
+    save:执行添加操作
+    edit:跳转到修改页,或者打开修改操作的模态窗口
+    update:执行修改操作
+    get:执行查询操作 find/select/query/...
+    特殊操作 login等
+
+    -->
+
+    <!--注册中央调度器-->
+
+<!--注册自定义过滤器过滤静态资源-->
+    <filter>
+        <filter-name>MyFilter</filter-name>
+        <filter-class>com.bjpowernode.crm.settings.handler.MyFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>MyFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <servlet>
+        <servlet-name>myweb</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!--设置读取springMVC配置文件的路径-->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:conf/dispatcherServlet.xml</param-value>
+        </init-param>
+        <!--服务器启动时创建中央调度器对象-->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <!--.do结尾的文件会被中央调度器处理-->
+    <servlet-mapping>
+        <servlet-name>myweb</servlet-name>
+        <url-pattern>*.do</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
+    <!--注册spring的监听器，服务器启动时候创建spring容器-->
+    <!--制定自定义spring配置文件的位置-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:conf/applicationContext.xml</param-value>
+    </context-param>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+
+
+    <!--注册字符集过滤器-->
+    <filter>
+        <filter-name>characterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <!--设置三个属性值-->
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceRequestEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceResponseEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>characterEncodingFilter</filter-name>
+        <url-pattern>*.html</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>com.bjpowernode.crm.web.listener.SysInitListener</listener-class>
+    </listener>
+
+
+
+</web-app>
